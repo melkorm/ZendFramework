@@ -185,10 +185,17 @@ class Zend_Controller_Router_Rewrite extends Zend_Controller_Router_Abstract
                     $childRouteNames = explode(',', $info->chain);
                 }
 
-                foreach ($childRouteNames as $childRouteName) {
-                    $childRoute = $this->getRoute(trim($childRouteName));
-                    $route->chain($childRoute);
-                }
+	            $separators = array();
+	            if ($info->separators instanceof Zend_Config)
+	            {
+		            $separators = (array)$info->separators->toArray();
+	            }
+	            foreach ($childRouteNames as $key => $childRouteName)
+	            {
+		            $childRoute = $this->getRoute(trim($childRouteName));
+		            $separator = isset($separators[$key]) ? $separators[$key] : Zend_Controller_Router_Route_Chain::URI_DELIMITER;
+		            $route->chain($childRoute, $separator);
+	            }
 
                 $this->addRoute($name, $route);
             } elseif (isset($info->chains) && $info->chains instanceof Zend_Config) {
